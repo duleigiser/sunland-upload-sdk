@@ -1,6 +1,6 @@
 {
   "name": "sunland-upload-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "sync file to sunland file system",
   "main": "index.js",
   "scripts": {
