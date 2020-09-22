@@ -1,5 +1,5 @@
 const path = require("path")
-const uploadFiles = require("./upload")
+const uploadFiles = require("./bin/upload")
 const version = require('./package.json').version
 var conf = require(path.join(process.cwd(), 'uploadConf.json'))
 if(!conf) {

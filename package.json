@@ -10,6 +10,9 @@
     "type": "git",
     "url": "git+https://github.com/duleigiser/sunland-upload-sdk.git"
   },
+  "bin": {
+    "upload": "./bin/upload.js"
+  },
   "dependencies": {
     "request": "^2.88.2",
     "request-promise-native": "^1.0.9"
