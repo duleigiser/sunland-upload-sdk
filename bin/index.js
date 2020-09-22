@@ -8,6 +8,6 @@ if(!conf) {
   console.err('请在项目根目录配置uploadConf')
   return
 } 
-console.log(`---------- verson ${verson}-------`)
+console.log(`---------- verson ${version}-------`)
 console.log(`dist ====> ${conf.remotePath}, please wait...`)
 uploadFiles(conf)
