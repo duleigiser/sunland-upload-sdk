@@ -79,20 +79,20 @@ async function getUploadUrl(url, data, token) {
 async function uploadFiles(conf) {
   const { SDUrl, accessKey, secretKey, prefix, localPath, remotePath } = conf
   // 获取文件列表
-  let desDir = path.resolve(__dirname, localPath)
+  let desDir = path.resolve(process.cwd(), localPath)
   const files = getFilesByDir(desDir, false, prefix, desDir)
   // 获取token
   let {data: tokenInfo} = JSON.parse(await getToken(SDUrl,accessKey,secretKey))
-  log(`获取token成功' + ${tokenInfo} \n`)
+  log(`获取token成功' + ${JSON.stringify(tokenInfo)} \n`)
   
-  files.map(async (item) => {
+  files.map(async (item, index) => {
     // 获取上传url
     let uploadUrl = await getUploadUrl(
         SDUrl,
         {"key": item.filePath, "authTimeout":60*10}, 
         tokenInfo.accessToken)
 
-    log(`获取uploadUrl成功 + ${uploadUrl} \n`)
+    // log(`获取uploadUrl成功 + ${JSON.stringify(uploadUrl)} \n`)
     fs.createReadStream(item.file)
       .pipe(rq.put(uploadUrl.data.uploadUrl,{headers: uploadUrl.data.header}, 
         function optionalCallback(err, httpResponse, body) {
@@ -102,6 +102,7 @@ async function uploadFiles(conf) {
           }
           else 
             log(`success upload file: ${item.filePath}  =>  ${remotePath}${item.filePath} \n`);
+            if (index === files.length - 1) log('seems all right! ))_)): haha \n')
         }
       )
     )
