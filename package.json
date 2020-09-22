@@ -1,0 +1,26 @@
+{
+  "name": "sunland-upload-sdk",
+  "version": "1.0.0",
+  "description": "sync file to sunland file system",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duleigiser/sunland-upload-sdk.git"
+  },
+  "dependencies": {
+    "request": "^2.88.2",
+    "request-promise-native": "^1.0.9"
+  },
+  "keywords": [
+    "sunlands",
+    "file",
+    "clody",
+    "storage",
+    "cdn"
+  ],
+  "author": "",
+  "license": "ISC"
+}
