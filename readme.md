@@ -23,3 +23,15 @@
   * `secretKey` secretKey
   * `prefix` 拼接到cdn网址后(一般为项目名称)
   * `localPath` 本地需要上传的路径
+
+## 执行上传
+  
+-package.json
+```
+  {
+    "script": {
+      "upload": "upload xxx.json"
+    }
+  }
+```
+* tips `upload` 为暴露的`cli`命令
