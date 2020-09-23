@@ -102,7 +102,7 @@ async function uploadFiles(conf) {
           }
           else 
             log(`success upload file: ${item.filePath}  =>  ${remotePath}${item.filePath} \n`);
-            if (index === files.length - 1) log('seems all right! ))_)): haha \n')
+            // if (index === files.length - 1) log('seems all right! ))_)): haha \n')
         }
       )
     )
