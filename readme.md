@@ -2,7 +2,7 @@
 
 ## 安装
  ```sh
-  npm install --save cossync
+  npm install --save sunland-upload-sdk
  ```
  ## 配置项
 在项目根目录新建如下xxx.json
