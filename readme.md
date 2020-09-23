@@ -19,7 +19,7 @@
  ```
   * `SDUrl` 获取文件系统接口地址
   * `remotePath` 文件系统配置的cdn地址
-  * `accessKey` secretKey
+  * `accessKey` accessKey
   * `secretKey` secretKey
   * `prefix` 拼接到cdn网址后(一般为项目名称)
   * `localPath` 本地需要上传的路径
