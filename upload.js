@@ -1,7 +1,7 @@
 const path = require("path")
 const rq = require('request-promise-native')
 const fs = require('fs')
-
+const cacheFile = require('./cache')
 var log = getLog();
 
 /**
