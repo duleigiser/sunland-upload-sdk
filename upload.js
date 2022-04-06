@@ -80,12 +80,14 @@ async function uploadFiles(conf) {
   const { SDUrl, accessKey, secretKey, prefix, localPath, remotePath } = conf
   // 获取文件列表
   let desDir = path.resolve(process.cwd(), localPath)
-  const files = getFilesByDir(desDir, false, prefix, desDir)
+  let files = getFilesByDir(desDir, false, prefix, desDir)
   // 获取token
   let {data: tokenInfo} = JSON.parse(await getToken(SDUrl,accessKey,secretKey))
   log(`获取token成功' + ${JSON.stringify(tokenInfo)} \n`)
+  // 过滤已缓存文件，生成cache
+  files = await cacheFile(desDir, files)
   
-  files.map(async (item, index) => {
+  files.map(async (item) => {
     // 获取上传url
     let uploadUrl = await getUploadUrl(
         SDUrl,
