@@ -3,7 +3,7 @@ const rq = require('request-promise-native')
 const fs = require('fs')
 const cacheFile = require('./cache')
 var log = getLog();
-
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 /**
  * [getLog 打印信息函数]
  * @return {[function]} [description]
@@ -96,7 +96,9 @@ async function uploadFiles(conf) {
 
     // log(`获取uploadUrl成功 + ${JSON.stringify(uploadUrl)} \n`)
     fs.createReadStream(item.file)
-      .pipe(rq.put(uploadUrl.data.uploadUrl,{headers: uploadUrl.data.header}, 
+      .pipe(rq.put(uploadUrl.data.uploadUrl,{headers: uploadUrl.data.header, agentOptions: {
+        rejectUnauthorized: false
+      }}, 
         function optionalCallback(err, httpResponse, body) {
           if(err) {
             log(`item.filePath+'    部署失败', ${err} \n`)
