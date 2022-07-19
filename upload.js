@@ -104,6 +104,8 @@ const _upload = (item, uploadUrl, remotePath, index, retry = false) => {
       method: 'PUT',
       timeout: 10000,
       data: fs.createReadStream(item.file),
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity
     }
     axios(options).then(res=> {
       log(`success upload file: ${item.filePath}  =>  ${remotePath}${item.filePath} \n`);
