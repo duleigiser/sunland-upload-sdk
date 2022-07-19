@@ -1,9 +1,9 @@
 const path = require("path")
-const rq = require('request-promise-native')
+const axios = require('axios')
 const fs = require('fs')
-const cacheFile = require('./cache')
-var log = getLog();
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+const cacheFile = require('./cache');
+
+const log = getLog();
 /**
  * [getLog 打印信息函数]
  * @return {[function]} [description]
@@ -45,12 +45,10 @@ function getFilesByDir(dir, outFiles, prefix, desDir ) {
  * @param {*} secretKey
  * @return {*} {"accessToken":"wfD07yvRa2P8x3IwW5mpJ+l4w+Y=","appid":"xxx","expiredTime":1600244424}
  */
-async function getToken(url,accessKey,secretKey) {
-  return await rq({
-    url: url+ 'token', 
-    method: 'POST', 
-    headers: {"content-type": "application/json","version": "1.0"},
-    body: JSON.stringify({accessKey,secretKey, timeout: 60* 60})
+ async function getToken(_url) {
+  return await axios({
+    url: `${_url}/sfs/getToken`, 
+    method: 'GET', 
   })
 }
 
@@ -64,52 +62,62 @@ async function getToken(url,accessKey,secretKey) {
  * @return {*} null
  */
 async function getUploadUrl(url, data, token) {
-  return JSON.parse(await rq({
-    url: url+ '/upload', 
+  return axios({
+    url: url+ 'upload', 
     method: 'POST', 
     headers: {
       "content-type": "application/json",
       "version": "1.0", 
       "authorization": token
     },
-    body: JSON.stringify(data)
-  }))
+    data
+  })
 }
 
+
 async function uploadFiles(conf) {
-  const { SDUrl, accessKey, secretKey, prefix, localPath, remotePath } = conf
+  const { SDUrl, prefix, localPath, remotePath, apiPath } = conf
   // 获取文件列表
   let desDir = path.resolve(process.cwd(), localPath)
   let files = getFilesByDir(desDir, false, prefix, desDir)
   // 获取token
-  let {data: tokenInfo} = JSON.parse(await getToken(SDUrl,accessKey,secretKey))
-  log(`获取token成功' + ${JSON.stringify(tokenInfo)} \n`)
+  // let {data: tokenInfo} = JSON.parse(await getToken(SDUrl,accessKey,secretKey))
+  let {data:{ data: accessToken}}= await getToken(apiPath)
+  log(`获取token成功' + ${JSON.stringify(accessToken)} \n`)
   // 过滤已缓存文件，生成cache
   files = await cacheFile(desDir, files)
-  
-  files.map(async (item) => {
-    // 获取上传url
-    let uploadUrl = await getUploadUrl(
-        SDUrl,
-        {"key": item.filePath, "authTimeout":60*10}, 
-        tokenInfo.accessToken)
+  const asyncFunc = async () => {
+    files.map(async (item,index) => {
+      let  uploadUrl = await getUploadUrl(SDUrl,{"key": item.filePath, "authTimeout":6*100}, accessToken)
+      await _upload(item, uploadUrl.data, remotePath, index)
+    });
 
-    // log(`获取uploadUrl成功 + ${JSON.stringify(uploadUrl)} \n`)
-    fs.createReadStream(item.file)
-      .pipe(rq.put(uploadUrl.data.uploadUrl,{headers: uploadUrl.data.header, agentOptions: {
-        rejectUnauthorized: false
-      }}, 
-        function optionalCallback(err, httpResponse, body) {
-          if(err) {
-            log(`item.filePath+'    部署失败', ${err} \n`)
-            throw err
-          }
-          else 
-            log(`success upload file: ${item.filePath}  =>  ${remotePath}${item.filePath} \n`);
-            // if (index === files.length - 1) log('seems all right! ))_)): haha \n')
-        }
-      )
-    )
-  })  
+  };
+  console.log(`1共 ${files.length-1}文件 `)
+  asyncFunc()
 }
+const _upload = (item, uploadUrl, remotePath, index, retry = false) => {
+  return new Promise(resolve=> {
+    const options = {
+      url: uploadUrl.data.uploadUrl,
+      headers: {...uploadUrl.data.header},
+      method: 'PUT',
+      timeout: 10000,
+      data: fs.createReadStream(item.file),
+    }
+    axios(options).then(res=> {
+      log(`success upload file: ${item.filePath}  =>  ${remotePath}${item.filePath} \n`);
+      resolve(res.data)
+      if(retry) {
+        console.log(index +' 重新上传成功')
+      }
+      
+    }).catch(async e => {
+      console.log(index +' 上传失败, 重新上传！')
+      await _upload(item, uploadUrl, remotePath, index, true) 
+    })
+  })
+}
+
+
 module.exports = uploadFiles
