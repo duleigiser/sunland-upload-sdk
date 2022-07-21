@@ -1,6 +1,6 @@
 {
   "name": "sunland-upload-sdk",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "sync file to sunland file system",
   "main": "upload.js",
   "scripts": {
@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
-    "md5": "^2.3.0"
+    "md5": "^2.3.0",
+    "request-promise-native": "^1.0.9"
   },
   "keywords": [
     "sunlands",

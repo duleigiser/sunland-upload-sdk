@@ -1,6 +1,7 @@
 const path = require("path")
 const axios = require('axios')
 const fs = require('fs')
+const rq = require('request-promise-native')
 const cacheFile = require('./cache');
 
 const log = getLog();
@@ -98,25 +99,23 @@ async function uploadFiles(conf) {
 }
 const _upload = (item, uploadUrl, remotePath, index, retry = false) => {
   return new Promise(resolve=> {
-    const options = {
-      url: uploadUrl.data.uploadUrl,
-      headers: {...uploadUrl.data.header},
-      method: 'PUT',
-      timeout: 10000,
-      data: fs.createReadStream(item.file),
-      maxContentLength: Infinity,
-      maxBodyLength: Infinity
-    }
-    axios(options).then(res=> {
-      log(`success upload file: ${item.filePath}  =>  ${remotePath}${item.filePath} \n`);
-      resolve(res.data)
-      if(retry) {
-        console.log(index +' 重新上传成功')
-      }
-      
-    }).catch(async e => {
+    fs.createReadStream(item.file)
+      .pipe(rq.put(uploadUrl.data.uploadUrl,{headers: uploadUrl.data.header, timeout:10000, agentOptions: {}}, 
+        async function optionalCallback(err, httpResponse, body) {
+          if(err) {
+            await _upload(item, uploadUrl, remotePath, index, true) 
+            log(`${uploadUrl.data.uploadUrl}   部署失败', ${err} \n`)
+            if(retry) {
+              console.log(index +' 重新上传成功')
+            }
+          }
+          else 
+            log(`success upload file: ${item.filePath}  =>  ${remotePath}${item.filePath} \n`);
+        }
+      )
+    ).catch(()=> {
       console.log(index +' 上传失败, 重新上传！')
-      await _upload(item, uploadUrl, remotePath, index, true) 
+      _upload(item, uploadUrl, remotePath, index, true)
     })
   })
 }
