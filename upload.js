@@ -64,7 +64,7 @@ function getFilesByDir(dir, outFiles, prefix, desDir ) {
  */
  async function getUploadUrl(url, data, token) {
   return JSON.parse(await rq({
-    url: url+ '/upload', 
+    url: url+ 'upload', 
     method: 'POST', 
     headers: {
       "content-type": "application/json",
@@ -89,8 +89,10 @@ async function uploadFiles(conf) {
   files = await cacheFile(desDir, files)
   const asyncFunc = async () => {
     files.map(async (item,index) => {
-      let  uploadUrl = await getUploadUrl(SDUrl,{"key": item.filePath, "authTimeout":6*100}, accessToken)
-      await _upload(item, uploadUrl.data, remotePath, index)
+      let  uploadUrl = await getUploadUrl(SDUrl,{"key": item.filePath, "authTimeout":6*100}, accessToken).catch(e=> {
+        throw new Error(e, 'upload fail')
+      })
+      await _upload(item, uploadUrl, remotePath, index)
     });
 
   };
