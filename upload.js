@@ -62,17 +62,17 @@ function getFilesByDir(dir, outFiles, prefix, desDir ) {
  * @param {*} token 获取的token
  * @return {*} null
  */
-async function getUploadUrl(url, data, token) {
-  return axios({
-    url: url+ 'upload', 
+ async function getUploadUrl(url, data, token) {
+  return JSON.parse(await rq({
+    url: url+ '/upload', 
     method: 'POST', 
     headers: {
       "content-type": "application/json",
       "version": "1.0", 
       "authorization": token
     },
-    data
-  })
+    body: JSON.stringify(data)
+  }))
 }
 
 
