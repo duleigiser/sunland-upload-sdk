@@ -102,7 +102,7 @@ async function uploadFiles(conf) {
 const _upload = (item, uploadUrl, remotePath, index, retry = false) => {
   return new Promise(resolve=> {
     fs.createReadStream(item.file)
-      .pipe(rq.put(uploadUrl.data.uploadUrl,{headers: uploadUrl.data.header, timeout:10000, agentOptions: {}}, 
+      .pipe(rq.put(uploadUrl.data.uploadUrl,{headers: uploadUrl.data.header, timeout:30000, agentOptions: {}}, 
         async function optionalCallback(err, httpResponse, body) {
           if(err) {
             await _upload(item, uploadUrl, remotePath, index, true) 
