@@ -77,7 +77,7 @@ function getFilesByDir(dir, outFiles, prefix, desDir ) {
 
 
 async function uploadFiles(conf) {
-  const { SDUrl, prefix, localPath, remotePath, apiPath } = conf
+  const { SDUrl, prefix, localPath, remotePath, apiPath, needCache = false } = conf
   // 获取文件列表
   let desDir = path.resolve(process.cwd(), localPath)
   let files = getFilesByDir(desDir, false, prefix, desDir)
@@ -86,7 +86,9 @@ async function uploadFiles(conf) {
   let {data:{ data: accessToken}}= await getToken(apiPath)
   log(`获取token成功' + ${JSON.stringify(accessToken)} \n`)
   // 过滤已缓存文件，生成cache
-  files = await cacheFile(desDir, files)
+  if (needCache) { 
+    files = await cacheFile(desDir, files)
+  }
   const asyncFunc = async () => {
     files.map(async (item,index) => {
       let  uploadUrl = await getUploadUrl(SDUrl,{"key": item.filePath, "authTimeout":6*100}, accessToken).catch(e=> {
