@@ -91,8 +91,10 @@ async function uploadFiles(conf) {
   }
   const asyncFunc = async () => {
     files.map(async (item,index) => {
-      let  uploadUrl = await getUploadUrl(SDUrl,{"key": item.filePath, "authTimeout":6*100}, accessToken).catch(e=> {
-        throw new Error(e, 'upload fail')
+      let uploadUrl = await getUploadUrl(SDUrl, { "key": item.filePath, "authTimeout": 1800}, accessToken).catch(async e => {
+        return await getUploadUrl(SDUrl, { "key": item.filePath, "authTimeout": 1800 }, accessToken).catch(async e => { 
+          throw new Error(e, 'upload fail')
+        })
       })
       await _upload(item, uploadUrl, remotePath, index)
     });
